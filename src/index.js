@@ -3,6 +3,7 @@ import styles from "./styles";
 import { parseEntity, getAttributeOrState, readableColor } from "./utils";
 import filterEntity from "./filterEntity";
 import { name, version } from "../package.json";
+import { computeEntityName } from "./entity-name";
 
 function printVersion(version) {
   console.info(`%c${name}: ${version}`, "font-weight: bold");
@@ -125,7 +126,6 @@ class BannerCard extends LitElement {
     }
 
     const data = {
-      name: attributes.friendly_name,
       state: state ? state.state : "",
       value: getAttributeOrState(state || {}, config.attribute),
       unit: attributes.unit_of_measurement,
@@ -137,11 +137,19 @@ class BannerCard extends LitElement {
       data.state = attributes.current_position;
     }
 
-    return {
+    const merged = {
       ...data,
       ...config,
       ...dynamicData,
     };
+
+    // config.name may be a structured name, which has to be resolved against the
+    // registry rather than spread in raw. map_value still wins if it sets a name.
+    if (!Object.prototype.hasOwnProperty.call(dynamicData, "name")) {
+      merged.name = computeEntityName(hass, state, config.name);
+    }
+
+    return merged;
   }
 
   grid(index = 1) {

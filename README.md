@@ -34,7 +34,7 @@ resources:
 | row_size             | \_number             | string\_                                                                                                                                                                                                    | Number of columns in the grid. 3 is the default and what looks best _in many cases_. Set "auto" to equal row_size to number of entities provided | `row_size: 4` |
 | entities[].entity    | _string_             | Entity id                                                                                                                                                                                                   | `- entity: binary_sensor.remote_ui`                                                                                                              |
 | entities[].unit      | _string_ or _false_  | Override the automatic unit                                                                                                                                                                                 | `unit: My unit`                                                                                                                                  |
-| entities[].name      | _string_             | Override the automatic usage of friendly_name                                                                                                                                                               | `name: A sensor`                                                                                                                                 |
+| entities[].name      | _string_ or _list_   | Override the automatic entity name. Accepts a [structured name](#structured-names) on Home Assistant 2026.4 and later.                                                                                                                                                               | `name: A sensor`                                                                                                                                 |
 | entities[].map_state | _object_             | Map state values to resulting text or icons. A string prefixed with mdi: or hass: will yield a rendered icon.                                                                                               | map_state:<br /> home: mdi:home-account<br /> not_home: mdi:walk                                                                                 |
 | entities[].attribute | _string_             | Display an attribute instead of the state                                                                                                                                                                   |                                                                                                                                                  |
 | entities[].size      | _number_             | Override how many "entity cells" this entity will fill. The default for most entities is 1 cell, except if you include a media_player which will use whatever is the value for `row_size`, thus full width. |                                                                                                                                                  |
@@ -81,6 +81,31 @@ map_state:
     value: mdi:stop
     name: A custom entity heading
 ```
+
+## Structured names
+
+*Requires Home Assistant 2026.4 or later. On earlier versions a structured `name` falls back to the entity's friendly name.*
+
+Home Assistant composes an entity's display name out of its registry context
+(entity, device, area, floor) rather than one `friendly_name` string. An entity's
+`name` can be a list of those parts instead of a plain string, so it keeps
+following renames and matches what the built-in cards show:
+
+```yaml
+type: custom:banner-card
+entities:
+  - entity: sensor.living_room_temperature
+    name:
+      - type: area
+      - type: entity
+```
+
+Available part types are `entity`, `device`, `parent_device`, `area`, `floor`, and
+`text` (a literal, written as `{type: text, text: Indoor}`). Parts that resolve to
+nothing are dropped. A plain string `name` keeps working exactly as before, and a
+`map_value` that sets `name` still takes precedence.
+
+See the [Home Assistant developer documentation](https://developers.home-assistant.io/docs/frontend/data#hassformatentitynamestateobj-name-options) for details.
 
 ## Using when
 
