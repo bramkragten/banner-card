@@ -100,7 +100,7 @@ entities:
       - type: entity
 ```
 
-Available part types are `entity`, `device`, `parent_device`, `area`, `floor`, and
+Available part types are `entity`, `device`, `area`, `floor`, and
 `text` (a literal, written as `{type: text, text: Indoor}`). Parts that resolve to
 nothing are dropped. A plain string `name` keeps working exactly as before, and a
 `map_value` that sets `name` still takes precedence.
